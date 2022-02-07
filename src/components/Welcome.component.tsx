@@ -1,10 +1,12 @@
-import { FC } from 'react'
-import { AiFillPlayCircle } from 'react-icons/ai'
+import { FC, useContext } from 'react'
+// import { AiFillPlayCircle } from 'react-icons/ai'
 import { SiEthereum } from 'react-icons/si'
 import { BsInfoCircle } from 'react-icons/bs'
 import { FeatureCard } from './FeatureCard.component'
 import { Input } from './Input.component'
 import { Loader } from './Loader.component'
+import { TransactionContext } from '../context/TransactionContext'
+import { shortenAddress } from '../util/shortenAddress'
 
 export interface WelcomeProps {
 
@@ -12,8 +14,17 @@ export interface WelcomeProps {
 
 export const Welcome: FC<WelcomeProps> = (props) => {
 
-    const connectWallet = () => { }
-    const handleSubmit = () => {}
+    const { connectWallet, currentAccount, handleChange, formData, sendTransaction, isLoading } = useContext(TransactionContext)
+
+    const handleSubmit = (e:any) => {
+
+        const {addressTo, amount, keyword, message} = formData!
+        
+        e.preventDefault()
+
+        if (!addressTo || !amount || !keyword || !message) return;
+        sendTransaction()
+     }
 
     const commonStyles = "min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white";
 
@@ -29,14 +40,18 @@ export const Welcome: FC<WelcomeProps> = (props) => {
                         Explore the crypto world. Buy and sell cryptocurrencies easily on kryptex
                     </p>
 
-                    <button type='button'
-                        onClick={connectWallet}
-                        className='flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]'
-                    >
-                        <span className='text-white text-base font-semibold'>
-                            Connect Wallet
-                        </span>
-                    </button>
+                    {!currentAccount
+                        && (
+                            <button type='button'
+                                onClick={connectWallet}
+                                className='flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]'
+                            >
+                                <span className='text-white text-base font-semibold'>
+                                    Connect Wallet
+                                </span>
+                            </button>
+                        )
+                    }
 
                     <div className="grid sm:grid-cols-3 grid-cols-2 w-full mt-10">
                         <FeatureCard title='Reliability' rounded='tl' />
@@ -59,7 +74,7 @@ export const Welcome: FC<WelcomeProps> = (props) => {
                             </div>
                             <div>
                                 <p className='text-white font-light text-sm'>
-                                    0xasdafasd.....fgdgf
+                                    {shortenAddress(currentAccount!)}
                                 </p>
                                 <p className='text-white font-semibold text-lg mt-1'>
                                     Ethereum
@@ -73,30 +88,30 @@ export const Welcome: FC<WelcomeProps> = (props) => {
                             placeholder='Address To'
                             name='addressTo'
                             type='text'
-                            handleChange={(e, name) => { }}
+                            handleChange={handleChange!}
                         />
                         <Input
                             placeholder='Amount (ETH)'
                             name='amount'
                             type='number'
-                            handleChange={(e, name) => { }}
+                            handleChange={handleChange!}
                         />
                         <Input
                             placeholder='Keyword (GIF)'
                             name='keyword'
                             type='text'
-                            handleChange={(e, name) => { }}
+                            handleChange={handleChange!}
                         />
                         <Input
                             placeholder='Enter Message'
                             name='message'
                             type='text'
-                            handleChange={(e, name) => { }}
+                            handleChange={handleChange!}
                         />
 
                         <div className='h-[1px] w-full bg-gray-400 my-2' />
 
-                        {true
+                        {isLoading
                             ? <Loader />
                             : (
                                 <button
